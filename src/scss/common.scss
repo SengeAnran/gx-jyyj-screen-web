@@ -1,0 +1,39 @@
+// 小标题
+.small-title {
+  font-size: 18px;
+  font-family: Microsoft YaHei;
+  font-weight: bold;
+  color: #ffffff;
+  line-height: 30px;
+}
+// 黄色渐变
+.yellow-gradient {
+  background: linear-gradient(0deg, #f6b980 0%, #f5dcc4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+// 酒红色渐变
+.claret-gradient {
+  background: linear-gradient(0deg, #ff6d6e 0%, #ff9999 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+// 酒红色渐变
+.green-gradient {
+  background: linear-gradient(0deg, #00ce79 0.146484375%, #a5cfbd 98.2421875%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.yellow {
+  // background: #f6b980;
+  background: #ebb21a;
+}
+.claret {
+  // background: #ff6d6e;
+  background: #e71a19;
+}
+.greed,
+.green {
+  // background: #00ce79;
+  background: #1e913f;
+}
