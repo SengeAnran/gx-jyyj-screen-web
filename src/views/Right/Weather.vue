@@ -2,36 +2,97 @@
   <div class="weather">
     <div class="location-time">
       <div class="location">
-        <span class="location-name">北京</span>
-        <el-cascader v-model="value" :popper-append-to-body="false" :options="options" placeholder="切换城市" @change="handleChange" />
+        <span class="location-name">{{city}}</span>
+<!--        <el-cascader v-model="value" :popper-append-to-body="false" :options="options" placeholder="切换城市" @change="handleChange" />-->
       </div>
-      <div class="time">2024-10-24</div>
+      <div class="time">{{date}}</div>
     </div>
     <div class="weather-detail">
       <div class="detail-top">
         <div class="img-number">
           <img src="./img/Vector.svg" alt="">
-          <div class="number">23℃</div>
+          <div class="number">{{state.weatherDetail.temperature}}℃</div>
         </div>
         <div class="status-number">
-          <div>多云</div>
-          <div>18-26℃</div>
+          <div>{{state.weatherDetail.weather}}</div>
+<!--          <div>18-26℃</div>-->
         </div>
       </div>
       <div class="detail-bottom">
-        <div class="bottom-left">湿度：52%</div>
-        <div class="bottom-right">风向:东北风 3级</div>
+        <div class="bottom-left">湿度：{{state.weatherDetail.humidity}}%</div>
+        <div class="bottom-right">风向: {{state.weatherDetail.windDirection}}风 {{state.weatherDetail.windPower}}级</div>
       </div>
-      <div class="pm">
-        <div class="pm-button">PM:26</div>
-        <div class="pm-button">空气质量：优</div>
-      </div>
+<!--      <div class="pm">-->
+<!--        <div class="pm-button">PM:26</div>-->
+<!--        <div class="pm-button">空气质量：优</div>-->
+<!--      </div>-->
     </div>
+    <div id="container"></div>
   </div>
 </template>
 <script setup>
-import { ref } from 'vue'
+  import moment from 'moment';
+import { ref, reactive, onMounted, watch,nextTick } from 'vue'
+import AMapLoader from "@amap/amap-jsapi-loader";
+let map = null;
+const date = ref('');
+const city = ref('');
+const state = reactive({
+  city: '北京',// 城市
+  weatherDetail: {
 
+  }
+})
+onMounted(() => {
+  getCityName();
+  date.value = moment().format('YYYY-MM-DD');
+  window._AMapSecurityConfig = {
+    securityJsCode: "d62398e7a727ad9cdc91e870bb9b7792", // 「你申请的安全密钥」
+  };
+  AMapLoader.load({
+    key: "b0db333ab8745a42ece941961c735115", // 申请好的Web端开发者Key，首次调用 load 时必填
+    version: "2.0", // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+    plugins: ["AMap.Weather"], //需要使用的的插件列表，如比例尺'AMap.Scale'，支持添加多个如：['...','...']
+  })
+    .then((AMap) => {
+      map = new AMap.Map('container');
+    })
+})
+  watch(city, () =>  {
+    nextTick(() => getWeatherInfo() )
+    }, {
+    immediate: true,
+  })
+function getCityName() {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`)
+        .then(response => response.json())
+        .then(data => {
+          city.value = data.address.state;
+          console.log(data); // 输出城市
+        })
+        .catch(error => console.error(error));
+    }, function(error) {
+      console.error(error);
+    });
+  } else {
+    console.log("Geolocation API not supported in this browser.");
+  }
+}
+function getWeatherInfo() {
+  console.log('getWeatherInfo')
+  if (!map) return;
+  map.plugin(['AMap.Weather'], function() {
+    //构造 Weather 类
+    var amapWeather = new AMap.Weather();
+    //查询实时天气信息，cityName 见 http://restapi.amap.com/v3/config/district?level=city&sublevel=0&extensions=all&output=xml&key=d9fba2f3196b6a4419358693a2b0d9a9
+    amapWeather.getLive(city.value,function (err, data) {
+      console.log('询实时天气信息', data);
+      state.weatherDetail = data;
+    });
+  });
+}
 const value = ref('')
 const handleChange = (value) => {
   console.log(value)
@@ -67,7 +128,7 @@ const options =  [
       label: '顶部导航'
     }]
   }]
-}]
+}];
 </script>
 <style scoped lang="scss">
 .location-time {

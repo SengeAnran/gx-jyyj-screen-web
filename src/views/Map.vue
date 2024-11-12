@@ -12,7 +12,7 @@
 </template>
 <script setup>
 import * as Cesium from "cesium";
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, onUnmounted } from 'vue'
 import { useMapStore } from '@/stores/map.js';
 let cesiumContainer, intervalTimer,_tileset;
 const  mapStore = useMapStore();
@@ -445,6 +445,9 @@ function addLine() {
     index += 1;
   }, 500);
 }
+onUnmounted(() => {
+  window.clearInterval(intervalTimer);
+});
 function mapLine(positions) {
   // console.log(positions);
   // 画线
