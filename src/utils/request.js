@@ -1,12 +1,12 @@
 
 import axios from 'axios'
-import config from "./config";
+// import config from "./config";
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: config.apiHost, // api 的 base_url
+  baseURL: '/api', // api 的 base_url
   // baseURL: '/api', // api 的 base_url
-  timeout: 10 * 1000 // 请求超时时间
+  timeout: 10 * 10000 // 请求超时时间
 })
 
 // request拦截器

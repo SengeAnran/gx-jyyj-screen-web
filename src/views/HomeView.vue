@@ -1,7 +1,7 @@
 <template>
   <div class="page">
 
-<!--    <Map/>-->
+    <Map/>
     <div class="bgBox"></div>
     <div class="mask"></div>
     <div class="title">应急救灾指挥系统</div>

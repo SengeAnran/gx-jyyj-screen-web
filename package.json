@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^1.0.1",
+    "axios": "^1.7.7",
     "cesium": "^1.122.0",
     "element-plus": "^2.8.7",
     "moment": "^2.30.1",

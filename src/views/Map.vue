@@ -13,7 +13,9 @@
 <script setup>
 import * as Cesium from "cesium";
 import { onMounted, ref, watch, onUnmounted } from 'vue'
+import { savePath, findClosestRoutePoints } from '@/api/home.js';
 import { useMapStore } from '@/stores/map.js';
+import { ElMessage, ElMessageBox } from 'element-plus'
 let cesiumContainer, intervalTimer,_tileset;
 const  mapStore = useMapStore();
 onMounted(() => {
@@ -52,183 +54,18 @@ const btnList = ref([
     iconUrl:  new URL(`./img/icon_02.svg`, import.meta.url).href,
     text: '清空标记'
   },
-  // {
-  //   iconUrl:  new URL(`./img/icon_04.svg`, import.meta.url).href,
-  //   text: '放大比例'
-  // },
-  // {
-  //   iconUrl:  new URL(`./img/icon_05.svg`, import.meta.url).href,
-  //   text: '缩小比例'
-  // },
-]);
-let viewer, ponitList=[];
-const cartesian3List = [
   {
-    "x": -1259401.2794352956,
-    "y": 5661872.089237007,
-    "z": 2649269.280730839
+    iconUrl:  new URL(`./img/icon_04.svg`, import.meta.url).href,
+    text: '开始取点'
   },
-{
-  "x": -1259379.6506536033,
-  "y": 5661876.408244012,
-  "z": 2649278.7137766224
-},
-{
-  "x": -1259402.3028077383,
-  "y": 5661884.985914112,
-  "z": 2649244.588274462
-},
-{
-  "x": -1259431.773671328,
-  "y": 5661913.207955723,
-  "z": 2649176.999476872
-},
-{
-  "x": -1259451.4052268593,
-  "y": 5661923.672434686,
-  "z": 2649132.5630332166
-},
-{
-  "x": -1259479.3899059256,
-  "y": 5661924.321391844,
-  "z": 2649123.5837813164
-},
-{
-  "x": -1259496.467238654,
-  "y": 5661932.354593843,
-  "z": 2649093.8025288405
-},
-{
-  "x": -1259528.189831528,
-  "y": 5661924.75994718,
-  "z": 2649097.179445888
-},
-{
-  "x": -1259563.9641384974,
-  "y": 5661929.767497125,
-  "z": 2649073.1878377143
-},
-{
-  "x": -1259563.9641384974,
-  "y": 5661929.767497125,
-  "z": 2649073.1878377143
-},
-{
-  "x": -1259579.6404113083,
-  "y": 5661937.328672726,
-  "z": 2649047.3558519804
-},
-{
-  "x": -1259604.3603334704,
-  "y": 5661937.187974492,
-  "z": 2649035.522939544
-},
-{
-  "x": -1259679.0441888878,
-  "y": 5661955.318390355,
-  "z": 2648968.1160179223
-},
-{
-  "x": -1259689.1740217395,
-  "y": 5661970.975631009,
-  "z": 2648931.024374283
-},
-{
-  "x": -1259770.010076384,
-  "y": 5661990.479087922,
-  "z": 2648862.818749257
-},
-{
-  "x": -1259799.2101726043,
-  "y": 5661988.703019861,
-  "z": 2648850.034164774
-},
-{
-  "x": -1259800.1717422453,
-  "y": 5661989.091433876,
-  "z": 2648849.252935413
-},
-{
-  "x": -1259824.4772652749,
-  "y": 5661996.082487175,
-  "z": 2648821.398599136
-},
-{
-  "x": -1259824.6553899206,
-  "y": 5662014.621692779,
-  "z": 2648789.0614825864
-},
-{
-  "x": -1259800.9811942305,
-  "y": 5662031.695794176,
-  "z": 2648775.256321861
-},
-{
-  "x": -1259812.1351341205,
-  "y": 5662045.521123588,
-  "z": 2648758.944769252
-},
-{
-  "x": -1259826.7270880996,
-  "y": 5662048.719766922,
-  "z": 2648758.907641579
-},
-{
-  "x": -1259861.7867741382,
-  "y": 5662083.177342528,
-  "z": 2648722.0766395233
-},
-{
-  "x": -1259868.214976083,
-  "y": 5662091.343140586,
-  "z": 2648711.0556571395
-},
-{
-  "x": -1259909.8893607233,
-  "y": 5662103.56241395,
-  "z": 2648688.0610230076
-},
-{
-  "x": -1259946.3655274697,
-  "y": 5662139.594088473,
-  "z": 2648616.379734994
-},
-{
-  "x": -1259962.110774777,
-  "y": 5662181.300103608,
-  "z": 2648555.8655963913
-},
-{
-  "x": -1260018.5442241924,
-  "y": 5662230.602362952,
-  "z": 2648478.5949635208
-},
-{
-  "x": -1260026.1820966066,
-  "y": 5662269.825369085,
-  "z": 2648422.256436846
-},
-{
-  "x": -1260021.975580974,
-  "y": 5662322.283335333,
-  "z": 2648362.1493916768
-},
-{
-  "x": -1260002.7034174688,
-  "y": 5662353.71306571,
-  "z": 2648342.0703357747
-},
-{
-  "x": -1260037.3358330298,
-  "y": 5662358.751991008,
-  "z": 2648317.1057244097
-},
-{
-  "x": -1260043.1525933833,
-  "y": 5662351.110187736,
-  "z": 2648328.88084909
-},
-];
+  {
+    iconUrl:  new URL(`./img/icon_05.svg`, import.meta.url).href,
+    text: '结束取点'
+  },
+]);
+let viewer, ponitList=[],linePoint = [], canSavePoint = false, clickPoint = []
+let cartesian3List = [];
+
 async function  initCesium() {
 
   // 密钥
@@ -294,9 +131,9 @@ async function  initCesium() {
       surface,
       new Cesium.Cartesian3(),
     );
-
     // modelMatrix 该3D瓦片集的模型矩阵。
     tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);
+
     //  当3d数据加载完之后 优化性能参数
     // 瓦片加载事件。
     tileset.tilesLoaded.addEventListener(function () {
@@ -318,20 +155,16 @@ async function  initCesium() {
     // 获取 pick 拾取对象位置
     var position = viewer.scene.pickPosition(event.position);
     console.log("获取到的坐标：", position);
+    if(canSavePoint) {
+      linePoint.push({...position});
+    }
     if (startMark.value) {
+      clickPoint.push({...position});
       if (markNumber.value === 0) {
-        addPoint( {
-          "x": -1259401.2794352956,
-          "y": 5661872.089237007,
-          "z": 2649269.280730839
-        });
+        addPoint( {...position});
         markNumber.value = 1;
       } else if (markNumber.value === 1) {
-        addPoint({
-          "x": -1260043.1525933833,
-          "y": 5662351.110187736,
-          "z": 2648328.88084909
-        });
+        addPoint( {...position});
         markNumber.value = 2;
         startMark.value = false;
       }
@@ -427,16 +260,43 @@ function addPoint(position) {
  *
  **/
 function removeAllPonit() {
+  clickPoint = [];
+  cartesian3List = [];
   viewer.entities.removeAll();  // 删除地图上绘制的所有的点
+}
+/**
+ * 路径规划
+ * */
+function pathPlanning() {
+  if (clickPoint.length !== 2) {
+    ElMessage({
+      type: 'warning',
+      message: `请标记起始坐标两个位置`,
+    })
+    return
+  }
+  const data = {
+    startPoint: clickPoint[0],
+    endPoint: clickPoint[1],
+  }
+  ElMessage({
+    type: 'success',
+    message: `正在规划中`,
+  })
+  findClosestRoutePoints(data).then(res => {
+    cartesian3List = res;
+    addLine();
+  })
 }
 
 /**
  *  画线
  */
 function addLine() {
+  // clickPoint = [];
   let index = 0;
   intervalTimer = window.setInterval(() => {
-    if (index == (cartesian3List.length -1)) {
+    if (index === (cartesian3List.length -1)) {
       window.clearInterval(intervalTimer);
       return
     }
@@ -485,15 +345,72 @@ function zoomOut() {
   let moveRate = cameraHeight / 20.0;
   viewer.camera.moveBackward(moveRate);
 }
+// 开始取点
+function startSavePoint() {
+  canSavePoint = true;
+  linePoint = [];
+}
+// 结束取点
+function endSavePoint() {
+  canSavePoint = false;
+  ElMessageBox.prompt('请输入路线名称', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+  }).then(({ value }) => {
+    const data = {
+      points: linePoint,
+      pathOrder: value,
+    }
+    console.log(data);
+    savePath(data).then(res => {
+      ElMessage({
+        type: 'success',
+        message: `提交成功`,
+      })
+      linePoint = [];
+    })
+  }).catch(() => {
+    linePoint = [];
+    ElMessage({
+      type: 'info',
+      message: '取消输入',
+    })
+  });
+
+}
+// 标记
+function startPoint() {
+  startMark.value = true;
+  markNumber.value = 0;
+}
+//世界坐标转换经纬度和高度
+function worldCoordinateToPoint(worldCoordinate) {
+  // 获取经纬度
+  const ellipsoid = viewer.scene.globe.ellipsoid;
+  var cartographic = ellipsoid.cartesianToCartographic(worldCoordinate);
+  var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+  var latitude = Cesium.Math.toDegrees(cartographic.latitude);
+  var height = cartographic.height;
+
+  console.log('经度: ' + longitude + ', 纬度: ' + latitude + ', 高度: ' + height);
+  return {
+    longitude,
+    latitude,
+    height,
+  }
+
+}
 //  功能
 function handAble(item) {
   switch (item.text) {
-    case '标记': startMark.value = true; markNumber.value = 0; break;
+    case '标记': startPoint(); break;
     case '复位': resetView(); break;
-    case '路径规划': addLine(); break;
+    case '路径规划': pathPlanning(); break;
     case '放大比例': zoomIn(); break;
     case '缩小比例': zoomOut(); break;
     case '清空标记': removeAllPonit(); break;
+    case '开始取点': startSavePoint(); break;
+    case '结束取点': endSavePoint(); break;
   }
 }
 </script>

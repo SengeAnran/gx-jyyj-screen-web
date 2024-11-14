@@ -10,7 +10,7 @@
     <div class="weather-detail">
       <div class="detail-top">
         <div class="img-number">
-          <img src="./img/Vector.svg" alt="">
+          <img :src="state.weatherDetail.imgUrl" alt="">
           <div class="number">{{state.weatherDetail.temperature}}℃</div>
         </div>
         <div class="status-number">
@@ -31,12 +31,13 @@
   </div>
 </template>
 <script setup>
+  import  {weatherToImg} from './constant'
   import moment from 'moment';
 import { ref, reactive, onMounted, watch,nextTick } from 'vue'
 import AMapLoader from "@amap/amap-jsapi-loader";
 let map = null;
 const date = ref('');
-const city = ref('');
+const city = ref('北京');
 const state = reactive({
   city: '北京',// 城市
   weatherDetail: {
@@ -56,6 +57,7 @@ onMounted(() => {
   })
     .then((AMap) => {
       map = new AMap.Map('container');
+      getWeatherInfo();
     })
 })
   watch(city, () =>  {
@@ -64,13 +66,15 @@ onMounted(() => {
     immediate: true,
   })
 function getCityName() {
+  console.log(' getCityName'); // 输出城市
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(function(position) {
+      console.log('position',position);
       fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`)
         .then(response => response.json())
         .then(data => {
           city.value = data.address.state;
-          console.log(data); // 输出城市
+          console.log(' 输出城市',data); // 输出城市
         })
         .catch(error => console.error(error));
     }, function(error) {
@@ -89,7 +93,7 @@ function getWeatherInfo() {
     //查询实时天气信息，cityName 见 http://restapi.amap.com/v3/config/district?level=city&sublevel=0&extensions=all&output=xml&key=d9fba2f3196b6a4419358693a2b0d9a9
     amapWeather.getLive(city.value,function (err, data) {
       console.log('询实时天气信息', data);
-      state.weatherDetail = data;
+      state.weatherDetail = {...data, imgUrl: weatherToImg['阵雨']};
     });
   });
 }

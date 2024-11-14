@@ -20,11 +20,11 @@ export default defineConfig({
     port: 8080,
     // 设置反向代理，跨域
     proxy: {
-      '/api1': {
+      '/api': {
         // 后台地址
-        target: 'http://127.0.0.1:8990/',
+        target: 'http://192.168.0.115:8081/',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/api1/, '')
+        rewrite: path => path.replace(/^\/api/, '')
       },
       '/geomap': {
         // 后台地址
