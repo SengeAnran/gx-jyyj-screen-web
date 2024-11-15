@@ -12,6 +12,7 @@
 </template>
 <script setup>
 import * as Cesium from "cesium";
+import moment from 'moment';
 import { onMounted, ref, watch, onUnmounted } from 'vue'
 import { savePath, findClosestRoutePoints } from '@/api/home.js';
 import { useMapStore } from '@/stores/map.js';
@@ -54,14 +55,14 @@ const btnList = ref([
     iconUrl:  new URL(`./img/icon_02.svg`, import.meta.url).href,
     text: '清空标记'
   },
-  {
-    iconUrl:  new URL(`./img/icon_04.svg`, import.meta.url).href,
-    text: '开始取点'
-  },
-  {
-    iconUrl:  new URL(`./img/icon_05.svg`, import.meta.url).href,
-    text: '结束取点'
-  },
+  // {
+  //   iconUrl:  new URL(`./img/icon_04.svg`, import.meta.url).href,
+  //   text: '开始取点'
+  // },
+  // {
+  //   iconUrl:  new URL(`./img/icon_05.svg`, import.meta.url).href,
+  //   text: '结束取点'
+  // },
 ]);
 let viewer, ponitList=[],linePoint = [], canSavePoint = false, clickPoint = []
 let cartesian3List = [];
@@ -154,7 +155,7 @@ async function  initCesium() {
   handler.setInputAction(function (event) {
     // 获取 pick 拾取对象位置
     var position = viewer.scene.pickPosition(event.position);
-    console.log("获取到的坐标：", position);
+    // console.log("获取到的坐标：", position);
     if(canSavePoint) {
       linePoint.push({...position});
     }
@@ -288,7 +289,22 @@ function pathPlanning() {
     addLine();
   })
 }
-
+// 添加事件列表数据
+function addThingListData() {
+  const startPoint = cartesian3List[0];
+  const endPoint = cartesian3List[cartesian3List.length -1];
+  const listData = [{
+    // name: '1.发现空地',
+    time: moment().format('YYYY-MM-DD HH:mm:ss'),
+    startLocation: worldCoordinateToPoint(Cesium.Cartesian3.fromElements(startPoint.x, startPoint.y, startPoint.z)),
+    endLocation: worldCoordinateToPoint(Cesium.Cartesian3.fromElements(endPoint.x, endPoint.y, endPoint.z)),
+    // area: '75平米',
+    // slope: '75平米',
+    width: startPoint.minWidth,
+  }]
+  // console.log(listData)
+  mapStore.setThingList(listData)
+}
 /**
  *  画线
  */
@@ -298,6 +314,7 @@ function addLine() {
   intervalTimer = window.setInterval(() => {
     if (index === (cartesian3List.length -1)) {
       window.clearInterval(intervalTimer);
+      addThingListData();
       return
     }
     const positions = [new Cesium.Cartesian3(cartesian3List[index].x, cartesian3List[index].y, cartesian3List[index].z), new Cesium.Cartesian3(cartesian3List[index+1].x, cartesian3List[index+1].y, cartesian3List[index+1].z)];
@@ -392,7 +409,7 @@ function worldCoordinateToPoint(worldCoordinate) {
   var latitude = Cesium.Math.toDegrees(cartographic.latitude);
   var height = cartographic.height;
 
-  console.log('经度: ' + longitude + ', 纬度: ' + latitude + ', 高度: ' + height);
+  // console.log('经度: ' + longitude + ', 纬度: ' + latitude + ', 高度: ' + height);
   return {
     longitude,
     latitude,

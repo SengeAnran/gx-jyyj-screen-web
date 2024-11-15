@@ -93,7 +93,12 @@ function getWeatherInfo() {
     //查询实时天气信息，cityName 见 http://restapi.amap.com/v3/config/district?level=city&sublevel=0&extensions=all&output=xml&key=d9fba2f3196b6a4419358693a2b0d9a9
     amapWeather.getLive(city.value,function (err, data) {
       console.log('询实时天气信息', data);
-      state.weatherDetail = {...data, imgUrl: weatherToImg['阵雨']};
+      if ( data.weather in weatherToImg)  {
+        state.weatherDetail = {...data, imgUrl: weatherToImg[data.weather]};
+      } else {
+        state.weatherDetail = {...data, imgUrl: weatherToImg['晴']};
+      }
+
     });
   });
 }

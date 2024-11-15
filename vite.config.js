@@ -22,7 +22,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         // 后台地址
-        target: 'http://192.168.0.115:8081/',
+        target: 'http://192.168.0.117:8081/',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, '')
       },

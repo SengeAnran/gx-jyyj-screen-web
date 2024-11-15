@@ -13,18 +13,19 @@
       </div>
     </div>
     <div class="min-title">
-      事件记录列表
+      路径更新信息
     </div>
     <div class="thing-list">
       <div class="thing-list-item" v-for="(item, index) in thingList" :key="index">
         <div class="thing-top">
-          <div class="name">{{item.name}}</div>
-          <div class="time">{{item.time}}</div>
+<!--          <div class="name">{{item.name}}</div>-->
+          <div class="time">时间：{{item.time}}</div>
         </div>
         <div class="thing-bottom">
-          <div class="thing-text-line">坐标：（{{item.location}}）</div>
-          <div class="thing-text-line">面积：{{item.area}}, 坡度：{{item.slope}}</div>
-          <div class="thing-text-line">报警设备：{{item.alarmEquipment}}</div>
+          <div class="thing-text-line">起点经维度：（{{item.startLocation.longitude.toFixed(2)}}，{{item.startLocation.latitude.toFixed(2)}}）</div>
+          <div class="thing-text-line">终点经维度：（{{item.endLocation.longitude.toFixed(2)}}，{{item.endLocation.latitude.toFixed(2)}}）</div>
+          <div class="thing-text-line">路线最小宽度：{{item.width}}</div>
+<!--          <div class="thing-text-line">报警设备：{{item.alarmEquipment}}</div>-->
         </div>
 
       </div>
@@ -32,8 +33,13 @@
   </div>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useMapStore } from '@/stores/map.js';
+const  mapStore = useMapStore();
 
+const thingList = computed( () => {
+ return mapStore.thingList
+})
 const ableList = ref([
   {
     iconUrl:  new URL(`./img/icon_01.svg`, import.meta.url).href,
@@ -68,24 +74,24 @@ const ableList = ref([
     text: '通信保障'
   },
 ]);
-const thingList = ref([
-  {
-    name: '1.发现空地',
-    time: '2024-10-29 15:31',
-    location: '192.145',
-    area: '75平米',
-    slope: '75平米',
-    alarmEquipment: '75平米',
-  },
-  {
-    name: '1.发现空地',
-    time: '2024-10-29 15:31',
-    location: '192.145',
-    area: '75平米',
-    slope: '75平米',
-    alarmEquipment: '75平米',
-  },
-])
+// const thingList = ref([
+//   {
+//     name: '1.发现空地',
+//     time: '2024-10-29 15:31',
+//     location: '192.145',
+//     area: '75平米',
+//     slope: '75平米',
+//     alarmEquipment: '75平米',
+//   },
+//   {
+//     name: '1.发现空地',
+//     time: '2024-10-29 15:31',
+//     location: '192.145',
+//     area: '75平米',
+//     slope: '75平米',
+//     alarmEquipment: '75平米',
+//   },
+// ])
 const searchValue=  ref('');
 </script>
 
