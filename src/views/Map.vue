@@ -1,14 +1,17 @@
 <template>
-  <div id="cesiumContainer" class="map">
-  </div>
-  <div class="btn-list">
-    <div class="btn-list-item"  v-for="(item, index) in btnList" @click="handAble(item)" :key="index">
-      <div class="btn-item-img">
-        <img :src="item.iconUrl" alt="">
+  <div>
+    <div id="cesiumContainer" class="map">
+    </div>
+    <div class="btn-list">
+      <div class="btn-list-item"  v-for="(item, index) in btnList" @click="handAble(item)" :key="index">
+        <div class="btn-item-img">
+          <img :src="item.iconUrl" alt="">
+        </div>
+        <div class="btn-text">{{item.text}}</div>
       </div>
-      <div class="btn-text">{{item.text}}</div>
     </div>
   </div>
+
 </template>
 <script setup>
 import * as Cesium from "cesium";
@@ -68,11 +71,11 @@ let viewer, ponitList=[],linePoint = [], canSavePoint = false, clickPoint = []
 let cartesian3List = [];
 
 async function  initCesium() {
-
-  // 密钥
-  const defaultAccessToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ODYwNDg3MS1lMGMwLTRkOTYtODU5Mi0yY2JhZWNmOGZjMWQiLCJpZCI6MjUxNTA1LCJpYXQiOjE3MzAyMDgzNzV9.otZgCDTr2OCqwHMh4YPvA9rwNq_Doc_UuTuElzTmyi8`;
-  // 设置
-  Cesium.Ion.defaultAccessToken = defaultAccessToken;
+  // //
+  // // 密钥
+  // const defaultAccessToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ODYwNDg3MS1lMGMwLTRkOTYtODU5Mi0yY2JhZWNmOGZjMWQiLCJpZCI6MjUxNTA1LCJpYXQiOjE3MzAyMDgzNzV9.otZgCDTr2OCqwHMh4YPvA9rwNq_Doc_UuTuElzTmyi8`;
+  // // 设置
+  // Cesium.Ion.defaultAccessToken = defaultAccessToken;
   // let viewer = new Cesium.Viewer("cesiumContainer");
   // 创建视图
   viewer = new Cesium.Viewer("cesiumContainer", {
@@ -87,9 +90,14 @@ async function  initCesium() {
     navigationHelpButton: false, //是否显示帮助信息控件
     navigationInstructionsInitiallyVisible: false,
     animation: false, //是否显示动画控件
+    // globe: false,
     baseLayerPicker: false,//是否显示图层选择控件
     terrainProvider: await Cesium.createWorldTerrainAsync(),
     // imageryProvider:esri,//自定义图层
+    // imageryProvider: new SingleTileImageryProvider({
+    //   url:
+    //     "data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==",
+    // }),
   });
   // // 视图场景设置：隐藏地球
   // viewer.scene.sun.show = false; //在Cesium1.6(不确定)之后的版本会显示太阳和月亮,不关闭会影响展示
@@ -379,7 +387,7 @@ function endSavePoint() {
       pathOrder: value,
     }
     console.log(data);
-    savePath(data).then(res => {
+    savePath(data).then(() => {
       ElMessage({
         type: 'success',
         message: `提交成功`,
@@ -450,6 +458,7 @@ html,body,#cesiumContainer {
   display: none;
 }
 .btn-list {
+  z-index: 1;
   position: absolute;
   bottom: 100px;
   left: 50%;

@@ -4,6 +4,7 @@
     <Map/>
     <div class="bgBox"></div>
     <div class="mask"></div>
+    <div class="bg"></div>
     <div class="title">应急救灾指挥系统</div>
     <Left/>
     <Right/>
@@ -23,7 +24,7 @@ import Right from './Right/index.vue'
   position: relative;
   .title {
     position: absolute;
-    top: 43px;
+    top: 22px;
     left: 50%;
     transform: translateX( -50%);
     color: #FFF;
@@ -42,7 +43,18 @@ import Right from './Right/index.vue'
     bottom: 0;
     width: 100%;
     height: 100%;
-    background: url(../assets/img/bg.png) no-repeat 100% 100%;
+    background: url(../assets/img/mask_bg.svg) left top no-repeat;
+    background-size: 100% 100%;
+    pointer-events: none;
+  }
+  .bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: url(../assets/img/bg.svg) left top no-repeat;
+    background-size: 100% 100%;
     pointer-events: none;
   }
 }
