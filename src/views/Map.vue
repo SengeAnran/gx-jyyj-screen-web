@@ -73,9 +73,9 @@ let cartesian3List = [];
 async function  initCesium() {
   // //
   // // 密钥
-  // const defaultAccessToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ODYwNDg3MS1lMGMwLTRkOTYtODU5Mi0yY2JhZWNmOGZjMWQiLCJpZCI6MjUxNTA1LCJpYXQiOjE3MzAyMDgzNzV9.otZgCDTr2OCqwHMh4YPvA9rwNq_Doc_UuTuElzTmyi8`;
-  // // 设置
-  // Cesium.Ion.defaultAccessToken = defaultAccessToken;
+  const defaultAccessToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ODYwNDg3MS1lMGMwLTRkOTYtODU5Mi0yY2JhZWNmOGZjMWQiLCJpZCI6MjUxNTA1LCJpYXQiOjE3MzAyMDgzNzV9.otZgCDTr2OCqwHMh4YPvA9rwNq_Doc_UuTuElzTmyi8`;
+  // 设置
+  Cesium.Ion.defaultAccessToken = defaultAccessToken;
   // let viewer = new Cesium.Viewer("cesiumContainer");
   // 创建视图
   viewer = new Cesium.Viewer("cesiumContainer", {
@@ -90,7 +90,6 @@ async function  initCesium() {
     navigationHelpButton: false, //是否显示帮助信息控件
     navigationInstructionsInitiallyVisible: false,
     animation: false, //是否显示动画控件
-    // globe: false,
     baseLayerPicker: false,//是否显示图层选择控件
     terrainProvider: await Cesium.createWorldTerrainAsync(),
     // imageryProvider:esri,//自定义图层
@@ -110,7 +109,7 @@ async function  initCesium() {
   // viewer.scene.globe.baseColor = new Cesium.Color(0, 0, 0, 0);
   // viewer.scene.backgroundcolor = new Cesium.Color(0, 0, 0, 0);
   //
-  // viewer._cesiumWidget._creditContainer.style.display = "none";
+  viewer._cesiumWidget._creditContainer.style.display = "none";
   // 开启深度检测
   viewer.scene.globe.depthTestAgainstTerrain = true;
   viewer.scene.debugShowFramesPerSecond = true;
