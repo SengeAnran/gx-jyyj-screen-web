@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div id="cesiumContainer" class="map">
+  <div class="map" >
+    <div id="cesiumContainer" >
     </div>
     <div class="btn-list">
       <div class="btn-list-item"  v-for="(item, index) in btnList" @click="handAble(item)" :key="index">
@@ -445,6 +445,8 @@ function handAble(item) {
 .map {
   //position: relative;
   //z-index: -1 !important;
+  width: 100%;
+  height: 100%;
 }
 html,body,#cesiumContainer {
   width: 100%;

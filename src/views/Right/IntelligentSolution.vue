@@ -40,6 +40,7 @@ const question = ref('');
     height: 378px;
     padding: 22px;
     border-radius: 4px;
+    //background: linear-gradient(100deg, rgba(26, 72, 130, 0.32) 0%, rgba(26, 72, 130, 0.16) 92.48%);
     background: linear-gradient(100deg, rgba(26, 72, 130, 0.32) 0%, rgba(26, 72, 130, 0.16) 92.48%);
     .solution-title {
       margin-bottom: 12px;

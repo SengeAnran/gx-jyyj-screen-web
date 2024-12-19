@@ -100,15 +100,17 @@ const searchValue=  ref('');
 
 .left {
   position: absolute;
-  top:118px;
+  top: 200px;
   left: 88px;
   padding: 32px 24px 19px;
-  width: 360px;
-  height: 814px;
-  border-radius: 7px;
-  border: 2px solid #274C77;
-  background: rgba(11, 22, 36, 0.70);
-  backdrop-filter: blur(10px);
+  width: 388px;
+  height: 816px;
+  //border-radius: 7px;
+  background: url("../img/content_bg.png") left top no-repeat;
+  background-size: 100% 100%;
+  //border: 2px solid #274C77;
+  //background: rgba(11, 22, 36, 0.70);
+  //backdrop-filter: blur(10px);
 }
 .able-list {
   display: flex;
