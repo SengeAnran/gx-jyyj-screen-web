@@ -2,13 +2,32 @@
   <div class="map" >
     <div id="cesiumContainer" >
     </div>
-    <div class="btn-list">
-      <div class="btn-list-item"  v-for="(item, index) in btnList" @click="handAble(item)" :key="index">
-        <div class="btn-item-img">
-          <img :src="item.iconUrl" alt="">
+    <div class="btn-list-box">
+<!--      <div  class="btns">-->
+<!--        &lt;!&ndash;        <div v-if="secondNavStart > 0" class="left-btn"></div>&ndash;&gt;-->
+<!--        <div class="left-btn" @click="toSecondaryLeft"></div>-->
+<!--        <div class="right-btn" @click="toSecondaryRight"></div>-->
+<!--      </div>-->
+      <div class="btn-list">
+        <div class="btn-list-item"  v-for="(item, index) in routes" :key="index" :style="posStyle(index)">
+          <div class="text" @click="handAble(item)">{{item.text}}</div>
+          <location-tool
+            v-if="item.name === 'locationTool' && item.childShow"
+            ref="locationToolCom"
+            :location="item.childPosition"
+            @getLatLon="getLatLon"
+            @toLocation="toLocation"
+          />
+          <able-list
+            v-if="item.childAbleList && item.childAbleList.length > 0 && item.childShow"
+            :able-list="item.childAbleList"
+            @useAble="useAble"
+          />
         </div>
-        <div class="btn-text">{{item.text}}</div>
       </div>
+      <div class="left-btn" @click="toSecondaryLeft"></div>
+      <div class="right-btn" @click="toSecondaryRight"></div>
+
     </div>
   </div>
 
@@ -20,12 +39,15 @@ import { onMounted, ref, watch, onUnmounted } from 'vue'
 import { savePath, findClosestRoutePoints } from '@/api/home.js';
 import { useMapStore } from '@/stores/map.js';
 import { ElMessage, ElMessageBox } from 'element-plus'
+import LocationTool from '@/views/components/LocationTool.vue'
+import AbleList from '@/views/components/AbleList.vue'
 let cesiumContainer, intervalTimer,_tileset;
 const  mapStore = useMapStore();
 onMounted(() => {
   initCesium();
   cesiumContainer= document.querySelector("#cesiumContainer");
   setMapScale();
+  console.log(locationToolCom.value)
 })
 watch(mapStore.scale, (val) => {
   if(val.scaleX && val.scaleY && cesiumContainer) {
@@ -35,35 +57,136 @@ watch(mapStore.scale, (val) => {
   immediate: true,
   deep: true,
 })
+
+/**
+ * 设置cesium缩放，应对页面的缩放
+ */
 function setMapScale() {
   // console.log(mapStore.scale,cesiumContainer);
   cesiumContainer.style.transform = `scale(${1/mapStore.scale.scaleX}, ${1/mapStore.scale.scaleY})`;
 }
+const locationToolCom = ref(null); // locationToolCom 组件
 const startMark = ref(false);
-const markNumber = ref(0);
-const btnList = ref([
+const markNumber = ref(0); // 标点数
+const markMaxNumber = ref(0); // 标点数
+const routes = ref([
   {
-    iconUrl:  new URL(`./img/icon_01.svg`, import.meta.url).href,
-    text: '标记'
+    // iconUrl:  new URL(`./img/icon_01.svg`, import.meta.url).href,
+    text: '标记',
+    childShow: false,
+    childAbleList: [
+      {
+        name: '直线测量',
+        iconUrl: new URL(`./img/able/icon_bj_01.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '折线测量',
+        iconUrl: new URL(`./img/able/icon_bj_02.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '高度测量',
+        iconUrl: new URL(`./img/able/icon_bj_03.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '面积测量',
+        iconUrl: new URL(`./img/able/icon_bj_04.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '体积测量',
+        iconUrl: new URL(`./img/able/icon_bj_05.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '体积测量',
+        iconUrl: new URL(`./img/able/icon_bj_06.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '体积测量',
+        iconUrl: new URL(`./img/able/icon_bj_07.svg`, import.meta.url).href,
+        active: false,
+      },
+    ]
   },
   {
-    iconUrl:  new URL(`./img/icon_02.svg`, import.meta.url).href,
+    text: '测量工具',
+    childShow: false,
+    childAbleList: [
+      {
+        name: '直线测量',
+        iconUrl: new URL(`./img/able/icon_cl_01.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '折线测量',
+        iconUrl: new URL(`./img/able/icon_cl_02.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '高度测量',
+        iconUrl: new URL(`./img/able/icon_cl_03.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '面积测量',
+        iconUrl: new URL(`./img/able/icon_cl_04.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '体积测量',
+        iconUrl: new URL(`./img/able/icon_cl_05.svg`, import.meta.url).href,
+        active: false,
+      },
+    ]
+  },
+  {
+    text: '路径规划',
+    childAbleList: [
+      {
+        name: '路线飞行',
+        iconUrl: new URL(`./img/able/icon_lj_01.svg`, import.meta.url).href,
+        active: false,
+      },
+      {
+        name: '录制路线',
+        iconUrl: new URL(`./img/able/icon_lj_02.svg`, import.meta.url).href,
+        active: false,
+      },
+    ]
+  },
+  {
+    name: 'locationTool',
+    text: '定位工具',
+    childShow: false,
+    childPosition: {
+      left: '50%',
+      bottom: 50 + 'px',
+    }
+  },
+
+  {
+    text: '信息接收'
+  },
+  {
+    text: '系统设置'
+  },
+
+  {
     text: '复位'
   },
   {
-    iconUrl:  new URL(`./img/icon_03.svg`, import.meta.url).href,
-    text: '路径规划'
-  },
-  {
-    iconUrl:  new URL(`./img/icon_02.svg`, import.meta.url).href,
     text: '清空标记'
   },
   // {
-  //   iconUrl:  new URL(`./img/icon_04.svg`, import.meta.url).href,
+  //   // iconUrl:  new URL(`./img/icon_04.svg`, import.meta.url).href,
   //   text: '开始取点'
   // },
   // {
-  //   iconUrl:  new URL(`./img/icon_05.svg`, import.meta.url).href,
+  //   // iconUrl:  new URL(`./img/icon_05.svg`, import.meta.url).href,
   //   text: '结束取点'
   // },
 ]);
@@ -157,16 +280,16 @@ async function  initCesium() {
     console.log(e)
   }
   //  拾取点位
-  var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
   // 设置左键点击事件
   handler.setInputAction(function (event) {
     // 获取 pick 拾取对象位置
-    var position = viewer.scene.pickPosition(event.position);
-    // console.log("获取到的坐标：", position);
+    const position = viewer.scene.pickPosition(event.position);
     if(canSavePoint) {
       linePoint.push({...position});
     }
-    if (startMark.value) {
+    // 标点
+    if (startMark.value && markMaxNumber.value === 2) {
       clickPoint.push({...position});
       if (markNumber.value === 0) {
         addPoint( {...position});
@@ -177,9 +300,19 @@ async function  initCesium() {
         startMark.value = false;
       }
     }
+    // console.log("获取到的坐标：", position);
+    // 拾取点位
+    if (startMark.value && markMaxNumber.value === 1) {
+      const {latitude, longitude} = worldCoordinateToPoint(position);
+      // console.log("获取到的坐标：",latitude,longitude, locationToolCom.value);
+      // 因为在v-fo人之内，locationToolCom.value为数组
+      locationToolCom.value[0].setLatLon({latitude,longitude});
+      startMark.value = false;
+      markMaxNumber.value = 0;
+    }
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
-
+/*
   // addLine();
   // Promise.all([...ponitList]).then(
   //   function (pins) {
@@ -187,7 +320,7 @@ async function  initCesium() {
   //   },
   // );
 
-  /**
+
    position viewer.camera.position
    {
    "x": 1457.6517381888157,
@@ -200,7 +333,7 @@ async function  initCesium() {
    pitch -1.4688832878206757  viewer.camera.pitch
    roll 6.233906033558268  viewer.camera.roll
 
-   */
+
 
   // // 定义目标位置和视角
   // var targetPosition = Cesium.Cartesian3.fromDegrees(
@@ -222,8 +355,8 @@ async function  initCesium() {
   //   },
   //   duration: 2 // 飞行动画时长
   // });
+  */
 }
-
 /**
  * 复位
  */
@@ -332,6 +465,7 @@ function addLine() {
 onUnmounted(() => {
   window.clearInterval(intervalTimer);
 });
+// 画线
 function mapLine(positions) {
   // console.log(positions);
   // 画线
@@ -385,7 +519,6 @@ function endSavePoint() {
       points: linePoint,
       pathOrder: value,
     }
-    console.log(data);
     savePath(data).then(() => {
       ElMessage({
         type: 'success',
@@ -402,10 +535,15 @@ function endSavePoint() {
   });
 
 }
-// 标记
-function startPoint() {
+//
+/**
+ * 标记
+ * @param number 标记点位数量
+ */
+function startPoint(number) {
   startMark.value = true;
   markNumber.value = 0;
+  markMaxNumber.value = number;
 }
 //世界坐标转换经纬度和高度
 function worldCoordinateToPoint(worldCoordinate) {
@@ -424,19 +562,94 @@ function worldCoordinateToPoint(worldCoordinate) {
   }
 
 }
-//  功能
+//  一级功能分发
 function handAble(item) {
+  // console.log(item);
   switch (item.text) {
-    case '标记': startPoint(); break;
+    // case '标记': startPoint(2); break;
+    case '标记': item.childShow = !item.childShow; break;
     case '复位': resetView(); break;
-    case '路径规划': pathPlanning(); break;
+    // case '路径规划': pathPlanning(); break;
+    case '路径规划': item.childShow = !item.childShow; break;
     case '放大比例': zoomIn(); break;
     case '缩小比例': zoomOut(); break;
     case '清空标记': removeAllPonit(); break;
+    case '测量工具': item.childShow = !item.childShow; break;
+    case '定位工具': item.childShow = !item.childShow; break;
     case '开始取点': startSavePoint(); break;
     case '结束取点': endSavePoint(); break;
   }
 }
+/**
+ * 使用二级功能
+ * 功能：做功能分发
+ */
+function useAble(item) {
+  console.log('选中功能', item);
+  switch (item.name) {
+    case '直线测量': break;
+  }
+}
+const firstIndex = ref(0)
+const _showCount = 4; //  显示数量
+// 位置
+function posStyle(i) {
+  const len = routes.value.length;
+  const newIndex = (len + i - firstIndex.value) % len;
+  let value, pos;
+  if ( newIndex < _showCount) {
+    value = newIndex * (120 + 10) + 10;
+    pos ={left: `${value}px`};
+  } else if ( newIndex === _showCount) { // n+ 1个
+    value = newIndex * (120 + 10) + 10;
+    pos ={left: `${value}px`, opacity: 0};
+  } else if ( newIndex === len) { // 最后一个
+    pos ={left: `-130px`, opacity: 0};
+  } else {
+    pos ={left: `-260px`, opacity: 0};
+  }
+  return pos;
+}
+// 左点击
+function toSecondaryRight() {
+  firstIndex.value = (firstIndex.value + 1)%routes.value.length;
+  console.log(firstIndex.value);
+  // secondNavStart.value = Math.max(0, secondNavStart.value - 1);
+}
+// 右点击
+function toSecondaryLeft() {
+  firstIndex.value = (routes.value.length + firstIndex.value - 1)%routes.value.length;
+  console.log(firstIndex.value);
+  // const max = Math.max(routes.value.length - 6, 0);
+  // secondNavStart.value = Math.min(max,secondNavStart.value + 1);
+}
+
+/**
+ * 定位工具
+ */
+
+/**
+ * 获取经纬度
+ */
+function getLatLon() {
+  startPoint(1);
+}
+/**
+ * 定位
+ */
+function toLocation(position) {
+  const { longitude, latitude } = position;
+  viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(longitude,latitude, 5000),
+    duration: 2.0, // 动画持续时间
+    endTransform: Cesium.Matrix4.IDENTITY, // 可选，结束姿态矩阵
+  })
+  const _position = Cesium.Cartesian3.fromDegrees(longitude,latitude, 3000);
+  console.log(_position.x, {..._position})
+  addPoint({..._position});
+}
+
+
 </script>
 
 
@@ -458,34 +671,101 @@ html,body,#cesiumContainer {
 ::v-deep .cesium-performanceDisplay {
   display: none;
 }
-.btn-list {
+.btn-list-box {
+  width: 530px;
+  height: 56px;
   z-index: 1;
   position: absolute;
-  bottom: 100px;
+  bottom: 62px;
   left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  .btn-list-item {
-    cursor: pointer;
-    margin: 0  30px;
-    text-align: center;
-    .btn-item-img {
-      width: 93px;
-      height: 93px;
-      img {
-        width: 100%;
-        height: 100%;
-      }
-      margin-bottom: 8px;
+  transform: translateX(-47%);
+  //overflow-y: visible;
+  .btns {
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 5px;
+    //transform: translateY(-50%);
+
+    .left-btn,.right-btn {
+      //top: -20px;
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
     }
-    .btn-text {
-      color: #FFF;
-      font-family: "PingFang SC";
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 22px; /* 137.5% */
+    .left-btn {
+      left: -30px;
+      background: url("./img/left_btn.svg") left top no-repeat;
+      background-size: 100% 100%;
+    }
+    .right-btn {
+      right: -30px;
+      background: url("./img/right_btn.svg") left top no-repeat;
+      background-size: 100% 100%;
     }
   }
+
+  .btn-list {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    //width: 812px;
+    //height: 56px;
+    //overflow-x: clip;
+    //display: flex;
+    .btn-list-item {
+      position: absolute;
+      top: 0;
+      width: 120px;
+      height: 56px;
+      //transition: left 0.5s;
+      //margin: 0 10px;
+
+      background: url("./img/btn.svg") left top no-repeat;
+      background-size: 100% 100%;
+
+      .text {
+        display: inline-block;
+        height: 100%;
+        width: 100%;
+        color: #00A3FF;
+        cursor: pointer;
+        text-align: center;
+        font-family: "PingFang SC";
+        font-size: 22px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 56px;
+
+      }
+      .text:hover {
+        color: #FFF;
+      }
+
+
+    }
+  }
+  .left-btn,.right-btn {
+    //top: -20px;
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+  }
+  .left-btn {
+    left: -30px;
+    top: 6px;
+    background: url("./img/left_btn.svg") left top no-repeat;
+    background-size: 100% 100%;
+  }
+  .right-btn {
+    right: -30px;
+    top: 6px;
+    background: url("./img/right_btn.svg") left top no-repeat;
+    background-size: 100% 100%;
+  }
+
 }
 </style>

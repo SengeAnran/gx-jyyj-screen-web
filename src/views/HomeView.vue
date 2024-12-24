@@ -24,7 +24,7 @@ import Right from './Right/index.vue'
   position: relative;
   .title {
     position: absolute;
-    top: 10px;
+    top: 8px;
     left: 50%;
     transform: translateX( -50%);
     color: #FFF;
@@ -53,8 +53,8 @@ import Right from './Right/index.vue'
     bottom: 0;
     width: 100%;
     height: 100%;
-    background: url(../assets/img/bg.png) left top no-repeat;
-    background-size: 100% 100%;
+    background: url(../assets/img/bg.png) left -9px no-repeat;
+    background-size: 100% 101%;
     pointer-events: none;
   }
 }

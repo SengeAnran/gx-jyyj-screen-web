@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="min-title">
-      路径更新信息
+      事件记录列表
     </div>
     <div class="thing-list">
       <div class="thing-list-item" v-for="(item, index) in thingList" :key="index">
@@ -178,13 +178,18 @@ const searchValue=  ref('');
   }
 }
 .min-title {
+  width: 310.671px;
+  height: 34px;
+  padding-left: 10px;
+  padding-top: 3px;
+  background: url("../img/title_bg.svg") left top no-repeat;
+  //background-size: 100% 100%;
   color: var(--Text-Primary, #F8FDFF);
   font-family: "PingFang SC";
   font-size: 22px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  margin-bottom: 23px ;
 }
 .thing-list {
   .thing-list-item {
